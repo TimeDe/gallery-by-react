@@ -50,9 +50,26 @@ imgDatas = imgDatas.map(x=> {
 
 //推荐使用ES6语法的class写法
 class ImgFigure extends React.Component {
-  constructor(props){
-   super(props);
-   };
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  };
+
+  /*
+   * imgFigure的点击处理函数
+   */
+  handleClick(e) {
+    //翻转和居中图片
+    if (this.props.arrange.isCenter) {
+      this.props.inverse();
+    } else {
+      this.props.center();
+    }
+
+    e.stopPropagation();
+    e.preventDefault();
+  }
+
   render() {
     var styleObj = {};
 
@@ -62,17 +79,29 @@ class ImgFigure extends React.Component {
     }
 
     //如果图片的旋转角度有值且不为0,添加旋转角度
-    if(this.props.arrange.rotate){
-      (['-moz-', '-ms-', '-webkit-', '']).forEach((value) => {
-        styleObj[value + 'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+    if (this.props.arrange.rotate) {
+      (['Moz', 'ms', 'Webkit', '']).forEach((value) => {
+        styleObj[value + 'Transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
       })
     }
 
+    if (this.props.arrange.isCenter) {
+      styleObj.zIndex = 11;
+    }
+
+    let imgFigureClassName = 'img-figure';
+    imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse' : '';
+
     return (
-      <figure className="img-figure" style={styleObj}>
+      <figure className={imgFigureClassName} style={styleObj} onClick={this.handleClick}>
         <img src={this.props.data.imgUrl} alt={this.props.data.title}/>
         <figcaption>
           <h2 className="img-title">{this.props.data.title}</h2>
+          <div className="img-back" onClick={this.handleClick}>
+            <p>
+              {this.props.data.desc}
+            </p>
+          </div>
         </figcaption>
       </figure>
     );
@@ -107,7 +136,9 @@ class AppComponent extends React.Component {
          left: '0',
          top: '0'
          },
-         rotate: 0
+         rotate: 0,   //旋转角度
+         isInverse: false,   //图片正反面,默认正面
+         isCenter: false     //图片是否居中,默认不居中
          }
          */
       ]
@@ -158,6 +189,24 @@ class AppComponent extends React.Component {
     this.rearrange(num);
   }
 
+  //反转图片的函数,采用闭包
+  inverse(index) {
+    return () => {
+      let imgsArrangeArr = this.state.imgsArrangeArr;
+      imgsArrangeArr[index].isInverse = !imgsArrangeArr[index].isInverse;
+      this.setState({
+        imgsArrangeArr: imgsArrangeArr
+      })
+    }
+  }
+
+  //利用rearrange函数,居中对应的图片
+  center(index) {
+    return () => {
+      this.rearrange(index);
+    }
+  }
+
   //重新布局所有图片,指定居中排布哪个图片
   rearrange(centerIndex) {
     let imgsArrangeArr = this.state.imgsArrangeArr,
@@ -179,7 +228,8 @@ class AppComponent extends React.Component {
     //首先居中centerIndex的图片,居中图片不需要旋转
     imgsArrangeCenterArr[0] = {
       pos: centerPos,
-      rotate: 0
+      rotate: 0,
+      isCenter: true
     };
 
     //取出要布局在上方的图片的状态信息
@@ -193,7 +243,8 @@ class AppComponent extends React.Component {
           top: getRangeRandom(vPosRangeTopY[0], vPosRangeTopY[1]),
           left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
         },
-        rotate: get30DegRandom()
+        rotate: get30DegRandom(),
+        isCenter: false
       };
     });
 
@@ -213,7 +264,8 @@ class AppComponent extends React.Component {
           top: getRangeRandom(hPosRangeY[0], hPosRangeY[1]),
           left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
         },
-        rotate: get30DegRandom()
+        rotate: get30DegRandom(),
+        isCenter: false
       };
     }
 
@@ -243,12 +295,15 @@ class AppComponent extends React.Component {
             left: 0,
             top: 0
           },
-          rotate: 0
+          rotate: 0,
+          isInverse: false,
+          isCenter: false
         }
       }
 
       imgFigures.push(<ImgFigure data={item} key={index} ref={'imgFigure' + index}
-                                 arrange={this.state.imgsArrangeArr[index]}/>)
+                                 arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}
+                                 center={this.center(index)}/>)
     });
 
     return (

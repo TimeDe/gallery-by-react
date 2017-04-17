@@ -65,5 +65,5 @@ module.exports = {
   publicPath: '/assets/',
   port: dfltPort,
   getDefaultModules: getDefaultModules,
-  distPublicPath : './assets/'
+  distPublicPath: './assets/'
 };
