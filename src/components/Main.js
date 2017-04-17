@@ -50,9 +50,9 @@ imgDatas = imgDatas.map(x=> {
 
 //推荐使用ES6语法的class写法
 class ImgFigure extends React.Component {
-  /*constructor(props){
+  constructor(props){
    super(props);
-   };*/
+   };
   render() {
     var styleObj = {};
 
