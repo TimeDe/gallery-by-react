@@ -10,6 +10,13 @@ let imgDatas = require('../data/imageDatas.json');
 //获取区间内的一个随机数
 let getRangeRandom = (low, high) => Math.floor(Math.random() * (high - low) + low);
 
+//获取0-30°之间的一个任意正负值
+let get30DegRandom = () => {
+  let deg = '';
+  deg = Math.random() > 0.5 ? '+' : '-';
+  return deg + Math.ceil(Math.random() * 30);
+};
+
 //利用自执行函数,将图片名信息转换为图片真实路径URL信息
 //ES6语法
 imgDatas = imgDatas.map(x=> {
@@ -54,6 +61,13 @@ class ImgFigure extends React.Component {
       styleObj = this.props.arrange.pos;
     }
 
+    //如果图片的旋转角度有值且不为0,添加旋转角度
+    if(this.props.arrange.rotate){
+      (['-moz-', '-ms-', '-webkit-', '']).forEach((value) => {
+        styleObj[value + 'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+      })
+    }
+
     return (
       <figure className="img-figure" style={styleObj}>
         <img src={this.props.data.imgUrl} alt={this.props.data.title}/>
@@ -67,6 +81,7 @@ class ImgFigure extends React.Component {
 
 
 class AppComponent extends React.Component {
+  //设置Constant初始值,自定义常量
   constructor(props) {
     super(props);
     this.Constant = {
@@ -86,12 +101,15 @@ class AppComponent extends React.Component {
     };
     this.state = {
       imgsArrangeArr: [
-        /*{
+        /* imgsArrangeArr的数据结构
+         {
          pos: {
          left: '0',
          top: '0'
+         },
+         rotate: 0
          }
-         }*/
+         */
       ]
     };
   }
@@ -106,7 +124,10 @@ class AppComponent extends React.Component {
       halfStageW = Math.ceil(stageW / 2),
       halfStageH = Math.ceil(stageH / 2);
 
-    //拿到一个imgFigure的大小
+    /*
+     *拿到一个imgFigure的大小
+     * 获取到真实的DOM节点
+     */
     let imgFigureDOM = ReactDOM.findDOMNode(this.refs.imgFigure0),
       imgW = imgFigureDOM.scrollWidth,
       imgH = imgFigureDOM.scrollHeight,
@@ -155,9 +176,10 @@ class AppComponent extends React.Component {
       topImgSpliceIndex = 0,
       imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex, 1);//中心图片的状态信息
 
-    //首先居中centerIndex的图片
+    //首先居中centerIndex的图片,居中图片不需要旋转
     imgsArrangeCenterArr[0] = {
-      pos: centerPos
+      pos: centerPos,
+      rotate: 0
     };
 
     //取出要布局在上方的图片的状态信息
@@ -170,7 +192,8 @@ class AppComponent extends React.Component {
         pos: {
           top: getRangeRandom(vPosRangeTopY[0], vPosRangeTopY[1]),
           left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
-        }
+        },
+        rotate: get30DegRandom()
       };
     });
 
@@ -178,7 +201,7 @@ class AppComponent extends React.Component {
     for (let i = 0, j = imgsArrangeArr.length, k = j / 2; i < j; i++) {
       let hPosRangeLORX = null;
 
-      //前半部分布局在左边,houbanbufenbujuzaiyoubian
+      //前半部分布局在左边,后半部分在右边
       if (i < k) {
         hPosRangeLORX = hPosRangeLeftSecX;//布局在左边
       } else {
@@ -189,7 +212,8 @@ class AppComponent extends React.Component {
         pos: {
           top: getRangeRandom(hPosRangeY[0], hPosRangeY[1]),
           left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
-        }
+        },
+        rotate: get30DegRandom()
       };
     }
 
@@ -218,7 +242,8 @@ class AppComponent extends React.Component {
           pos: {
             left: 0,
             top: 0
-          }
+          },
+          rotate: 0
         }
       }
 
