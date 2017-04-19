@@ -49,6 +49,9 @@ imgDatas = imgDatas.map(x=> {
  });*/
 
 //推荐使用ES6语法的class写法
+/*
+ *  图片管理ImgFigure组件
+ */
 class ImgFigure extends React.Component {
   constructor(props) {
     super(props);
@@ -108,6 +111,36 @@ class ImgFigure extends React.Component {
   }
 }
 
+/*
+ *  图片控制ControllerUnit组件
+ */
+class ControllerUnit extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  /*
+   * imgFigure的点击处理函数
+   */
+  handleClick(e) {
+    //翻转和居中图片
+    if (this.props.arrange.isCenter) {
+      this.props.inverse();
+    } else {
+      this.props.center();
+    }
+
+    e.stopPropagation();
+    e.preventDefault();
+  }
+
+  render() {
+    return (
+      <span className="controller-unit" onClick={this.handleClick}></span>
+    );
+  }
+}
 
 class AppComponent extends React.Component {
   //设置Constant初始值,自定义常量
@@ -303,7 +336,9 @@ class AppComponent extends React.Component {
 
       imgFigures.push(<ImgFigure data={item} key={index} ref={'imgFigure' + index}
                                  arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}
-                                 center={this.center(index)}/>)
+                                 center={this.center(index)}/>);
+
+      controlerUnits.push(<ControllerUnit />)
     });
 
     return (
