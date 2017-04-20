@@ -136,8 +136,20 @@ class ControllerUnit extends React.Component {
   }
 
   render() {
+    let controllerUnitClassName = 'controller-unit';
+
+    //如果是居中的图片,显示控制组件的居中状态
+    if(this.props.arrange.isCenter){
+      controllerUnitClassName += ' is-center';
+
+      //如果还是对应的翻转状态的图片,则显示控制组件的翻转状态
+      if(this.props.arrange.isInverse){
+        controllerUnitClassName += ' is-inverse';
+      }
+    }
+
     return (
-      <span className="controller-unit" onClick={this.handleClick}></span>
+      <span className={controllerUnitClassName} onClick={this.handleClick}></span>
     );
   }
 }
@@ -338,7 +350,8 @@ class AppComponent extends React.Component {
                                  arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}
                                  center={this.center(index)}/>);
 
-      controlerUnits.push(<ControllerUnit />)
+      controlerUnits.push(<ControllerUnit key={index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}
+                                          center={this.center(index)}/>)
     });
 
     return (
